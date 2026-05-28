@@ -1,0 +1,63 @@
+# Access4All-SA security rules for cPanel/Apache/LiteSpeed
+
+# Disable directory listings
+Options -Indexes
+
+# Turn on rewrite engine
+RewriteEngine On
+
+# Force HTTPS
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+<IfModule mod_headers.c>
+  # Enforce HTTPS in supported browsers
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+  # Stop MIME type sniffing
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Reduce clickjacking risk
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  # Reduce referrer leakage
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Disable risky browser features by default
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
+
+  # Content Security Policy tuned for this static site
+  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline'; connect-src 'self'; form-action 'self' mailto:; upgrade-insecure-requests"
+
+  # Optional extra privacy hardening
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  Header always set Cross-Origin-Resource-Policy "same-origin"
+</IfModule>
+
+# Protect hidden files and common sensitive files
+<FilesMatch "^(\.env|composer\.(json|lock)|package(-lock)?\.json|yarn\.lock|README|readme|license|LICENSE|\.git|\.svn)">
+  Require all denied
+</FilesMatch>
+
+# Block direct access to .ht* files except this one being processed by Apache
+<FilesMatch "^\.ht">
+  Require all denied
+</FilesMatch>
+
+# Block common backup files
+<FilesMatch "\.(bak|config|dist|fla|inc|ini|log|psd|sh|sql|swp|tmp)$">
+  Require all denied
+</FilesMatch>
+
+# Basic caching for static assets
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+  ExpiresByType image/jpeg "access plus 30 days"
+  ExpiresByType image/jpg "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+  ExpiresByType font/woff2 "access plus 30 days"
+</IfModule>
