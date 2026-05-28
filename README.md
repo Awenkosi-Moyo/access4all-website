@@ -46,7 +46,9 @@ Built and delivered as sole developer — from initial requirements gathering th
 
 ## Screenshots
 
-> _Add screenshots of the home page, programmes page, and mobile view here_
+![Homepage](screenshots/Homepage.png)
+![About](screenshots/About.png)
+![Mobile view](screenshots/Mobile%20view.png)
 
 ---
 
